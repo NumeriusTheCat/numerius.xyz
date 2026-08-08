@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-  const name = "NumeriusTheCat";
+  const name = "Numerius The Cat";
   let nameText = '';
   let nameIndex = 0;
   let isNameDeleting = false;
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const bioMessages = [
     "When in doubt, dupe.",
-    "\"Hello, World!\""
+    "\"Grief Grief Grief !\""
   ];
   let bioText = '';
   let bioIndex = 0;
