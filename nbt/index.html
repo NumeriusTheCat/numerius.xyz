@@ -26,7 +26,7 @@
         a.className = 'card unavailable';
         a.href = `/nbt/item.${i}/`;
         a.setAttribute('aria-label', `Item ${i} — unavailable`);
-        a.innerHTML = `\n          <div class="label">Item ${i}</div>\n          <div class="status">Unavailable</div>\n        `;
+        a.innerHTML = `\n          <div class="thumb" aria-hidden="true"></div>\n          <div class="label">Item ${i}</div>\n          <div class="status">Unavailable</div>\n        `;
         grid.appendChild(a);
       }
     })();
