@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NBT Items — numerius.xyz</title>
+  <link rel="stylesheet" href="/nbt/styles.css">
+</head>
+<body>
+  <header>
+    <h1>NBT Items</h1>
+    <p class="subtitle">All items below are currently unavailable.</p>
+  </header>
+
+  <main>
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </main>
+
+  <script>
+    // Generate a 4x20 grid (80 items). Links go to /nbt/item.1/ ... /nbt/item.80/
+    (function(){
+      const total = 80;
+      const grid = document.getElementById('grid');
+      for (let i = 1; i <= total; i++) {
+        const a = document.createElement('a');
+        a.className = 'card unavailable';
+        a.href = `/nbt/item.${i}/`;
+        a.setAttribute('aria-label', `Item ${i} — unavailable`);
+        a.innerHTML = `\n          <div class="label">Item ${i}</div>\n          <div class="status">Unavailable</div>\n        `;
+        grid.appendChild(a);
+      }
+    })();
+  </script>
+</body>
+</html>
