@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const bioMessages = [
-    "When in doubt, dupe.",
+    "When in doubt, dupe. When duping, don't doubt.",
     "\"Grief Grief Grief !\""
   ];
   let bioText = '';
