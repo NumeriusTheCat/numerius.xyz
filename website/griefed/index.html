@@ -23,7 +23,7 @@
       <h1>Uh Oh, you got griefed</h1>
       <p class="lead">Contact at <a class="discord" href="https://discord.gg/FdtjtWjrvu" target="_blank" rel="noopener noreferrer">https://discord.gg/FdtjtWjrvu</a></p>
 
-      <!-- Audio: chooses eek.mp3 if present, falls back to ambient.mp3. Autoplay muted; user can unmute. -->
+      <!-- Audio: chooses eek.mp3 if present at /griefed, falls back to ambient.mp3. Autoplay muted; user can unmute. -->
       <audio id="bg-audio" loop autoplay muted></audio>
       <div>
         <button id="audio-toggle">🔊 Unmute</button>
@@ -34,7 +34,8 @@
       (function(){
         const a = document.getElementById('bg-audio');
         const btn = document.getElementById('audio-toggle');
-        const candidates = ['/website/griefed/eek.mp3', '/website/griefed/ambient.mp3'];
+        // Check the public-facing paths under /griefed (not /website/griefed)
+        const candidates = ['/griefed/eek.mp3', '/griefed/ambient.mp3'];
 
         function checkAndSet(index){
           if(index >= candidates.length){
