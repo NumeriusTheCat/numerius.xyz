@@ -14,7 +14,6 @@
     h1 { font-size:2rem; margin:0 0 8px }
     p.lead { color:#000; font-size:1.25rem; margin:0 }
     a.discord { color:#0366d6; text-decoration:underline }
-    #audio-toggle { display:inline-block; margin-top:18px; padding:8px 12px; background:#222; color:white; border-radius:6px; text-decoration:none; border:none; cursor:pointer }
   </style>
 </head>
 <body>
@@ -23,23 +22,19 @@
       <h1>Uh Oh, you got griefed</h1>
       <p class="lead">Contact at <a class="discord" href="https://discord.gg/FdtjtWjrvu" target="_blank" rel="noopener noreferrer">https://discord.gg/FdtjtWjrvu</a></p>
 
-      <!-- Audio: chooses eek.mp3 if present at /griefed, falls back to ambient.mp3. Autoplay muted; user can unmute. -->
-      <audio id="bg-audio" loop autoplay muted></audio>
-      <div>
-        <button id="audio-toggle">🔊 Unmute</button>
-      </div>
+      <!-- Audio: chooses eek.mp3 if present at /griefed, falls back to ambient.mp3. Autoplay attempts to play with sound by default. -->
+      <audio id="bg-audio" loop autoplay></audio>
+
     </div>
 
     <script>
       (function(){
         const a = document.getElementById('bg-audio');
-        const btn = document.getElementById('audio-toggle');
-        // Check the public-facing paths under /griefed (not /website/griefed)
+        // Public-facing paths under /griefed
         const candidates = ['/griefed/eek.mp3', '/griefed/ambient.mp3'];
 
         function checkAndSet(index){
           if(index >= candidates.length){
-            if(btn) btn.style.display = 'none';
             if(a) a.remove();
             return;
           }
@@ -47,15 +42,26 @@
           fetch(url, { method: 'HEAD' }).then(resp => {
             if(resp.ok){
               a.src = url;
-              a.play().catch(()=>{});
+              // Try to play with sound by default
+              a.muted = false;
+              a.play().catch(() => {
+                // If the browser blocks unmuted autoplay, fallback to muted autoplay so audio starts silently
+                a.muted = true;
+                a.play().catch(()=>{});
+              });
             } else {
               checkAndSet(index + 1);
             }
           }).catch(() => {
+            // fallback to a small GET if HEAD isn't allowed
             fetch(url, { method: 'GET', headers: { Range: 'bytes=0-1' } }).then(r => {
               if(r.ok) {
                 a.src = url;
-                a.play().catch(()=>{});
+                a.muted = false;
+                a.play().catch(() => {
+                  a.muted = true;
+                  a.play().catch(()=>{});
+                });
               } else {
                 checkAndSet(index + 1);
               }
@@ -65,26 +71,13 @@
 
         checkAndSet(0);
 
-        if(btn){
-          btn.addEventListener('click', () => {
-            if(!a) return;
-            if(a.muted){
-              a.muted = false;
-              btn.textContent = '🔈 Mute';
-            } else {
-              a.muted = true;
-              btn.textContent = '🔊 Unmute';
-            }
-            a.play().catch(()=>{});
-          });
-        }
-
-        document.addEventListener('click', function once(){
-          if(a && !a.src) return;
-          if(a && a.muted){
+        // If the user interacts later, try to unmute and play (no visible control provided per request)
+        document.addEventListener('click', function onFirst(){
+          if(a && a.src){
+            a.muted = false;
             a.play().catch(()=>{});
           }
-          document.removeEventListener('click', once);
+          document.removeEventListener('click', onFirst);
         });
       })();
     </script>
