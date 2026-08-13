@@ -71,7 +71,19 @@
 
         checkAudio(0);
 
-        // If the user interacts later, try to unmute and play
+        // Start playback on the first cursor/pointer movement only. Subsequent movements are ignored.
+        function handleFirstPointerMove(){
+          if(a){
+            a.muted = false;
+            a.play().catch(()=>{});
+          }
+          // listener is registered with { once: true } so it will be removed automatically
+        }
+
+        // Use pointermove to cover mouse, pen, and touch pointers. Use once:true so it only fires once.
+        document.addEventListener('pointermove', handleFirstPointerMove, { once: true });
+
+        // Keep click fallback for older browsers or gestures
         document.addEventListener('click', function onFirst(){
           if(a && a.src){
             a.muted = false;
