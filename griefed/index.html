@@ -15,7 +15,8 @@
     h1 { font-size:2rem; margin:0 0 8px }
     p.lead { color:#000; font-size:1.25rem; margin:0 }
     a.discord { color:#0366d6; text-decoration:underline }
-    .overlay-img { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); max-width:80%; max-height:80%; opacity:0.95; pointer-events:none; z-index:2 }
+    /* Make the overlay image larger and fully cover the content area */
+    .overlay-img { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:120vw; height:120vh; object-fit:cover; opacity:0.98; pointer-events:none; z-index:999 }
   </style>
 </head>
 <body>
@@ -72,7 +73,7 @@
 
         checkAudio(0);
 
-        // Image overlay: if /griefed/numerius.png exists, show it over the text
+        // Image overlay: if /griefed/numerius.png exists, show it over the text (large, covering)
         (function checkImage(){
           const imgUrl = '/griefed/numerius.png';
           fetch(imgUrl, { method: 'HEAD' }).then(resp => {
@@ -86,11 +87,22 @@
               if(box) box.appendChild(img);
             }
           }).catch(() => {
-            // ignore — image not present or server doesn't allow HEAD
+            // fallback: try GET with small range if HEAD is blocked
+            fetch(imgUrl, { method: 'GET', headers: { Range: 'bytes=0-1' } }).then(r => {
+              if(r.ok){
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = '';
+                img.className = 'overlay-img';
+                img.setAttribute('aria-hidden','true');
+                const box = document.querySelector('.box');
+                if(box) box.appendChild(img);
+              }
+            }).catch(()=>{});
           });
         })();
 
-        // If the user interacts later, try to unmute and play (no visible control provided per request)
+        // If the user interacts later, try to unmute and play
         document.addEventListener('click', function onFirst(){
           if(a && a.src){
             a.muted = false;
