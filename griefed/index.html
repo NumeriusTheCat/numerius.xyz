@@ -8,40 +8,19 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
     html,body { height:100%; margin:0 }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height:1.6; color:#111; background:#fff }
+    /* Black background, white text */
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; line-height:1.6; color:#fff; background:#000 }
     main { min-height:100%; display:flex; align-items:center; justify-content:center; padding:48px }
-    .box { max-width:900px; text-align:center; position:relative; overflow:hidden }
+    .box { max-width:900px; text-align:center; position:relative }
     .content { position:relative; z-index:1 }
     h1 { font-size:2rem; margin:0 0 8px }
-    p.lead { color:#000; font-size:1.25rem; margin:0 }
-    a.discord { color:#0366d6; text-decoration:underline }
-
-    /* Full-viewport fixed overlay that sits on top of the content */
-    .overlay-img {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      opacity: 0.98;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* Optional: slightly dim the page under the image if you want the image to dominate */
-    .underlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0); /* change alpha to darken/lighten under image */
-      z-index: 0;
-      pointer-events: none;
-    }
+    p.lead { color:#fff; font-size:1.25rem; margin:0 }
+    a.discord { color:#58a6ff; text-decoration:underline }
   </style>
 </head>
 <body>
   <main>
     <div class="box">
-      <div class="underlay"></div>
       <div class="content">
         <h1>Uh Oh, you got griefed</h1>
         <p class="lead">Contact at <a class="discord" href="https://discord.gg/FdtjtWjrvu" target="_blank" rel="noopener noreferrer">https://discord.gg/FdtjtWjrvu</a></p>
@@ -92,33 +71,7 @@
 
         checkAudio(0);
 
-        // Image overlay: detect numerius.png and show full-screen overlay above text
-        (function checkImage(){
-          const imgUrl = '/griefed/numerius.png';
-
-          function showImg(){
-            const img = document.createElement('img');
-            img.src = imgUrl;
-            img.alt = '';
-            img.className = 'overlay-img';
-            img.setAttribute('aria-hidden','true');
-            document.body.appendChild(img); // append to body so it's fixed above everything
-          }
-
-          // Try HEAD then fall back to a small ranged GET if HEAD fails/blocked
-          fetch(imgUrl, { method: 'HEAD' }).then(resp => {
-            if(resp.ok) showImg();
-            else tryGet();
-          }).catch(tryGet);
-
-          function tryGet(){
-            fetch(imgUrl, { method: 'GET', headers: { Range: 'bytes=0-1' } }).then(r => {
-              if(r.ok) showImg();
-            }).catch(()=>{ /* no image */ });
-          }
-        })();
-
-        // If the user interacts later, try to unmute and play audio
+        // If the user interacts later, try to unmute and play
         document.addEventListener('click', function onFirst(){
           if(a && a.src){
             a.muted = false;
