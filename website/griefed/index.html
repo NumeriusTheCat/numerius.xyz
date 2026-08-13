@@ -13,6 +13,7 @@
     p.lead { color:#555 }
     .note { margin-top:24px; padding:12px; background:#f8f8f8; border-radius:8px; font-size:0.95rem }
     a.button { display:inline-block; margin-top:18px; padding:8px 12px; background:#0366d6; color:white; border-radius:6px; text-decoration:none }
+    #audio-toggle { display:inline-block; margin-top:18px; padding:8px 12px; background:#222; color:white; border-radius:6px; text-decoration:none; border:none; cursor:pointer }
   </style>
 </head>
 <body>
@@ -22,7 +23,76 @@
 
     <p class="note">Add content here describing what "griefed" means on this site. Replace this placeholder with your text, images, or other embeds.</p>
 
+    <!-- Audio: chooses eek.mp3 if present, falls back to ambient.mp3. Autoplay muted; user can unmute. -->
+    <audio id="bg-audio" loop autoplay muted></audio>
+    <button id="audio-toggle">🔊 Unmute</button>
+
     <a class="button" href="/">← Back to home</a>
+
+    <script>
+      (function(){
+        const a = document.getElementById('bg-audio');
+        const btn = document.getElementById('audio-toggle');
+        // Files to check in order; first one found will be used
+        const candidates = ['/website/griefed/eek.mp3', '/website/griefed/ambient.mp3'];
+
+        function checkAndSet(index){
+          if(index >= candidates.length){
+            // no audio found; hide controls
+            if(btn) btn.style.display = 'none';
+            if(a) a.remove();
+            return;
+          }
+          const url = candidates[index];
+          // Use HEAD to avoid downloading the file body if possible
+          fetch(url, { method: 'HEAD' }).then(resp => {
+            if(resp.ok){
+              a.src = url;
+              // attempt to play (muted autoplay should be allowed on most browsers)
+              a.play().catch(()=>{});
+            } else {
+              checkAndSet(index + 1);
+            }
+          }).catch(() => {
+            // network error or HEAD not allowed; try a lightweight GET with range header as fallback
+            fetch(url, { method: 'GET', headers: { Range: 'bytes=0-1' } }).then(r => {
+              if(r.ok) {
+                a.src = url;
+                a.play().catch(()=>{});
+              } else {
+                checkAndSet(index + 1);
+              }
+            }).catch(() => checkAndSet(index + 1));
+          });
+        }
+
+        checkAndSet(0);
+
+        if(btn){
+          btn.addEventListener('click', () => {
+            if(!a) return;
+            if(a.muted){
+              a.muted = false;
+              btn.textContent = '🔈 Mute';
+            } else {
+              a.muted = true;
+              btn.textContent = '🔊 Unmute';
+            }
+            a.play().catch(()=>{});
+          });
+        }
+
+        // If the page receives the first user interaction, ensure audio can play with sound (some browsers require this)
+        document.addEventListener('click', function once(){
+          if(a && !a.src) return; // nothing to do yet
+          if(a && a.muted){
+            // keep muted until user toggles; but ensure it is allowed to start
+            a.play().catch(()=>{});
+          }
+          document.removeEventListener('click', once);
+        });
+      })();
+    </script>
   </main>
 </body>
 </html>
