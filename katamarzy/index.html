@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katamarzy Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #profile-block {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 820px;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            opacity: 1;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .profile-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .profile-container::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 10px 10px,
+                #00CED1 10%,
+                transparent 15%
+            );
+            animation: orbit 3s linear infinite;
+            z-index: -1;
+            filter: blur(1px);
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .profile-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #profile-name {
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: #fff;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+            margin-bottom: 10px;
+        }
+
+        #profile-bio {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .bio-separator {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 20px 0;
+        }
+
+        .profile-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));
+        }
+
+        .social-icon:hover {
+            transform: scale(1.4) rotateY(15deg);
+        }
+
+        .voice-messages {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .voice-messages-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .voice-message-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-message-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateX(5px);
+        }
+
+        .voice-message-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .play-button {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00CED1, #FF6B9E);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 206, 209, 0.5);
+        }
+
+        .voice-message-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .voice-message-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .voice-message-duration {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .visitor-counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            align-self: flex-start;
+        }
+
+        .visitor-icon {
+            width: 18px;
+            height: 18px;
+            color: white;
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 430px) {
+            #profile-block {
+                width: 90vw;
+                max-width: 350px;
+                min-height: auto;
+                padding: 15px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .profile-container {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-picture {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-info {
+                align-items: center;
+                text-align: center;
+            }
+
+            #profile-name {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+
+            #profile-bio {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .voice-messages {
+                margin-top: 10px;
+            }
+
+            .voice-message-item {
+                padding: 8px;
+            }
+
+            .play-button {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+
+            .voice-message-name {
+                font-size: 12px;
+            }
+
+            .voice-message-duration {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Video (optional) -->
+        <video id="background" autoplay loop muted playsinline webkit-playsinline>
+            <source src="../assets/background.mp4" type="video/mp4">
+        </video>
+
+        <div id="profile-block">
+            <div class="profile-header">
+                <div class="profile-container">
+                    <!-- Replace with friend's profile picture -->
+                    <img src="../assets/profile.gif" alt="Profile" class="profile-picture">
+                </div>
+                <div class="profile-info">
+                    <div id="profile-name">Katamarzy</div>
+                    <div id="profile-bio">Add your friend's bio here</div>
+                </div>
+            </div>
+
+            <div class="bio-separator"></div>
+
+            <!-- Voice Messages Section -->
+            <div class="voice-messages">
+                <div class="voice-messages-title">🎙️ Voice Messages</div>
+                
+                <!-- Example Voice Message 1 -->
+                <div class="voice-message-item">
+                    <button class="play-button" onclick="playVoiceMessage(0)">▶</button>
+                    <div class="voice-message-info">
+                        <div class="voice-message-name">Message 1</div>
+                        <div class="voice-message-duration">0:00 - Add your message files to /katamarzy/voices/</div>
+                    </div>
+                </div>
+
+                <!-- Example Voice Message 2 -->
+                <div class="voice-message-item">
+                    <button class="play-button" onclick="playVoiceMessage(1)">▶</button>
+                    <div class="voice-message-info">
+                        <div class="voice-message-name">Message 2</div>
+                        <div class="voice-message-duration">0:00</div>
+                    </div>
+                </div>
+
+                <!-- Example Voice Message 3 -->
+                <div class="voice-message-item">
+                    <button class="play-button" onclick="playVoiceMessage(2)">▶</button>
+                    <div class="voice-message-info">
+                        <div class="voice-message-name">Message 3</div>
+                        <div class="voice-message-duration">0:00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-footer">
+                <!-- Social Links -->
+                <div class="social-links">
+                    <a href="https://discord.gg/dupes" target="_blank">
+                        <img src="../assets/discord.png" alt="Discord" class="social-icon">
+                    </a>
+                    <a href="https://github.com/NumeriusTheCat" target="_blank">
+                        <img src="../assets/github.png" alt="GitHub" class="social-icon">
+                    </a>
+                    <!-- Add more social links as needed -->
+                </div>
+
+                <!-- Visitor Counter -->
+                <div class="visitor-counter">
+                    <svg class="visitor-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <span>Profile Views</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden audio element for playing voice messages -->
+    <audio id="voice-audio" style="display: none;"></audio>
+
+    <script>
+        let currentAudio = null;
+        const voiceMessages = [
+            'message1.mp3',
+            'message2.mp3',
+            'message3.mp3'
+        ];
+
+        function playVoiceMessage(index) {
+            const audio = document.getElementById('voice-audio');
+            const button = event.target.closest('.play-button');
+            
+            if (currentAudio === index && !audio.paused) {
+                // Pause if already playing
+                audio.pause();
+                button.textContent = '▶';
+                currentAudio = null;
+            } else {
+                // Play new message
+                if (currentAudio !== null) {
+                    document.querySelectorAll('.play-button')[currentAudio].textContent = '▶';
+                }
+                
+                audio.src = `./voices/${voiceMessages[index]}`;
+                audio.play().catch(err => {
+                    console.error('Failed to play audio:', err);
+                    alert('Could not play audio. Make sure the file exists at /katamarzy/voices/' + voiceMessages[index]);
+                });
+                
+                button.textContent = '⏸';
+                currentAudio = index;
+            }
+        }
+
+        // Update button state when audio ends
+        document.getElementById('voice-audio').addEventListener('ended', function() {
+            if (currentAudio !== null) {
+                document.querySelectorAll('.play-button')[currentAudio].textContent = '▶';
+                currentAudio = null;
+            }
+        });
+
+        // Initialize background video
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundVideo = document.getElementById('background');
+            backgroundVideo.play().catch(err => {
+                console.error("Failed to play background video:", err);
+            });
+        });
+    </script>
+</body>
+</html>
