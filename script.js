@@ -236,8 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   const bioMessages = [
-    "When in doubt, dupe. When duping, don't doubt.",
-    "\"Grief Grief Grief !\""
+    "Meow, Meow, Mrooow, Purr Purr :3",
+    "\"Spread Evilness\""
   ];
   let bioText = '';
   let bioIndex = 0;
