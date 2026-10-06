@@ -116,23 +116,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 500);
 
 
-  function initializeVisitorCounter() {
-    let totalVisitors = localStorage.getItem('totalVisitorCount');
-    if (!totalVisitors) {
-      totalVisitors = 921234;
-      localStorage.setItem('totalVisitorCount', totalVisitors);
-    } else {
-      totalVisitors = parseInt(totalVisitors);
-    }
+  async function initializeVisitorCounter() {
+    const countApiUrl = 'https://api.countapi.xyz/hit/numerius.xyz/profile';
 
-    const hasVisited = localStorage.getItem('hasVisited');
-    if (!hasVisited) {
-      totalVisitors++;
-      localStorage.setItem('totalVisitorCount', totalVisitors);
-      localStorage.setItem('hasVisited', 'true');
-    }
+    try {
+      const response = await fetch(countApiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
-    visitorCount.textContent = totalVisitors.toLocaleString();
+      const data = await response.json();
+      const count = Number(data.value) || 0;
+      visitorCount.textContent = count.toLocaleString();
+    } catch (error) {
+      console.error('Failed to load profile view count:', error);
+      const fallback = Number(localStorage.getItem('profileViewFallback') || 921234);
+      localStorage.setItem('profileViewFallback', String(fallback));
+      visitorCount.textContent = fallback.toLocaleString();
+    }
   }
 
 
@@ -281,8 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
     isMuted = !isMuted;
     currentAudio.muted = isMuted;
     volumeIcon.innerHTML = isMuted
-      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>`
-      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
+      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15zm13.828-7.071a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15z"></path>`
+      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15z"></path>`;
   });
 
   volumeIcon.addEventListener('touchstart', (e) => {
@@ -290,15 +291,15 @@ document.addEventListener('DOMContentLoaded', () => {
     isMuted = !isMuted;
     currentAudio.muted = isMuted;
     volumeIcon.innerHTML = isMuted
-      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>`
-      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
+      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15zm13.828-7.071a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15z"></path>`
+      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15z"></path>`;
   });
 
   volumeSlider.addEventListener('input', () => {
     currentAudio.volume = volumeSlider.value;
     isMuted = false;
     currentAudio.muted = false;
-    volumeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
+    volumeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707 1.707L5.586 15z"></path>`;
   });
 
 
@@ -313,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
       skillsBlock.style.borderOpacity = '0';
       skillsBlock.style.borderColor = 'transparent';
       skillsBlock.style.backdropFilter = 'none';
-   
+    
       profileBlock.style.pointerEvents = 'auto';
       socialIcons.forEach(icon => {
         icon.style.pointerEvents = 'auto';
@@ -470,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTheme('assets/car_background.mp4', carMusic, 'car-theme');
   });
 
- 
+  
   function handleTilt(e, element) {
     const rect = element.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -581,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
   });
 
- 
+  
   let isShowingSkills = false;
   resultsButton.addEventListener('click', () => {
     if (!isShowingSkills) {
